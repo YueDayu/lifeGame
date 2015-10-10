@@ -14,31 +14,34 @@
   var lineColor = '#bbb',
     lineWidth = 2;
   var lifeColor = '#000',
-    deadColor = '#fff';
+    deadColor = '#fff',
+    wallColor = '#aaa';
   var burn = 3,
     stay = 2;
   var time = 100;
-  var lifeRate = 0.15;
+  var lifeRate = 0.5;
   var isStart = false;
   var gameLoop;
+  var container;
 
   /*
    * judge
    */
   var judge = function (x, y) {
+    if (showMap[x][y] == 2) return 2;
     var sum = 0;
-    for (var dx = -1; dx <= 1; dx++) {
-      for (var dy = -1; dy <= 1; dy++) {
-        if (dx === 0 && dy === 0) {
-          continue;
-        }
-        sum += showMap[(x + dx + height) % height][(y + dy + width) % width];
-      }
+    for (var dx = -2; dx <= 2; dx++) {
+      if (dx === 0) continue;
+      sum += (showMap[(x + dx + height) % height][(y + width) % width] == 1);
+    }
+    for (var dy = -2; dy <= 2; dy++) {
+      if (dy === 0) continue;
+      sum += (showMap[(x + height) % height][(y + dy + width) % width] == 1);
     }
     if (sum === burn) {
-      return true;
+      return 1;
     } else if (sum != stay) {
-      return false;
+      return 0;
     } else {
       return showMap[x][y];
     }
@@ -69,7 +72,7 @@
   var randomMap = function () {
     for (var i = 0; i < height; i++) {
       for (var j = 0; j < width; j++) {
-        showMap[i][j] = Boolean(Math.random() < lifeRate);
+        showMap[i][j] = Boolean(Math.random() < lifeRate) ? 1 : 0;
       }
     }
     render();
@@ -87,7 +90,7 @@
         context.beginPath();
         context.rect(j * size + lineWidth / 2, i * size + lineWidth / 2, size - lineWidth, size - lineWidth);
         if (showMap[i][j] === calculationMap[i][j]) continue;
-        if (showMap[i][j]) {
+        if (showMap[i][j] == 1) {
           context.fill();
         }
       }
@@ -98,7 +101,18 @@
         context.beginPath();
         context.rect(j * size + lineWidth / 2, i * size + lineWidth / 2, size - lineWidth, size - lineWidth);
         if (showMap[i][j] === calculationMap[i][j]) continue;
-        if (!showMap[i][j]) {
+        if (showMap[i][j] == 0) {
+          context.fill();
+        }
+      }
+    }
+    context.fillStyle = wallColor;
+    for (var i = 0; i < height; i++) {
+      for (var j = 0; j < width; j++) {
+        context.beginPath();
+        context.rect(j * size + lineWidth / 2, i * size + lineWidth / 2, size - lineWidth, size - lineWidth);
+        if (showMap[i][j] === calculationMap[i][j]) continue;
+        if (showMap[i][j] == 2) {
           context.fill();
         }
       }
@@ -146,7 +160,7 @@
   };
 
   /*
-   * param: (id, width, height, size), (id, width) or (id)
+   * param: (id, width, height, size, time, rate), (id, width), (id) or ()
    */
   var init = function () {
     if (arguments.length === 2) {
@@ -155,6 +169,8 @@
       width = arguments[1];
       height = arguments[2];
       size = arguments[3];
+      time = arguments[4];
+      lifeRate = arguments[5];
     }
     showMap = new Array(height);
     calculationMap = new Array(height);
@@ -162,7 +178,9 @@
       showMap[i] = new Array(width);
       calculationMap[i] = new Array(width);
     }
-    var container = document.getElementById(arguments[0]);
+    if (arguments.length != 0) {
+      container = document.getElementById(arguments[0]);
+    }
     canvas = document.createElement('canvas');
     canvas.width = width * size;
     canvas.height = height * size;
@@ -170,41 +188,53 @@
     context = canvas.getContext('2d');
     drawGrid();
     randomMap();
-    $(window).keypress(function(event) {
-      if (event.which == 13) {
-        if (isStart) {
-          stop();
-        } else {
-          start();
-        }
-      } else if (event.which == 32) {
-        if (!isStart) {
-          for (var x = 0; x < height; x++) {
-            for (var y = 0; y < width; y++) {
-              showMap[x][y] = false;
-              calculationMap[x][y] = true;
-            }
-          }
-          render();
-          for (var x = 0; x < height; x++) {
-            for (var y = 0; y < width; y++) {
-              calculationMap[x][y] = false;
-            }
-          }
-        }
+    $(canvas).mousedown(function (event) {
+      var y = Math.floor((event.offsetX) / 10);
+      var x = Math.floor((event.offsetY) / 10);
+      calculationMap[x][y] = showMap[x][y];
+      if (showMap[x][y] != 1) {
+        showMap[x][y] = 2 - showMap[x][y];
+      } else {
+        showMap[x][y] = 2;
       }
-    });
-    $(canvas).mousedown(function(event) {
-      console.log(Math.floor((event.offsetX) / 10) + " " + Math.floor((event.offsetY) / 10));
-      if (!isStart) {
-        var y = Math.floor((event.offsetX) / 10);
-        var x = Math.floor((event.offsetY) / 10);
-        calculationMap[x][y] = showMap[x][y];
-        showMap[x][y] = !showMap[x][y];
-        render();
-      }
+      render();
     });
   };
 
+  /*
+   * reload
+   */
+  var reload = function (x, y, n_time, n_rate) {
+    stop();
+    if (x > 0 && x <= 150) {
+      width = x;
+    }
+    if (y > 0 && y <= 150) {
+      height = y;
+    }
+    if (n_time > 0 && n_time <= 30) {
+      time = 1000 / n_time;
+    }
+    if (n_rate >= 0 && n_rate <= 1) {
+      lifeRate = n_rate;
+    }
+    container.removeChild(canvas);
+    init();
+  };
+
   window.lifeGame = init;
+  window.reloadGame = reload;
+  window.gameInfo = function () {
+    return {
+      width: width,
+      height: height,
+      rate: Math.round(1000 / time),
+      density: lifeRate,
+      isStart: isStart
+    }
+  };
+  window.gameControl = {
+    stop: stop,
+    start: start
+  };
 })();
