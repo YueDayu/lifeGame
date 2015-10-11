@@ -365,7 +365,7 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       test: [
-        //'babel',
+        'babel',
         'copy:styles'
       ],
       dist: [

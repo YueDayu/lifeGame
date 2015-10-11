@@ -75,8 +75,6 @@ var gameLife = function (global) {
         showMap[i][j] = Boolean(Math.random() < lifeRate) ? 1 : 0;
       }
     }
-    render();
-    start();
   };
 
   /*
@@ -142,6 +140,7 @@ var gameLife = function (global) {
    * start!
    */
   var start = function () {
+    if (isStart) return;
     isStart = true;
     gameLoop = setInterval(function () {
       nextStep();
@@ -168,6 +167,10 @@ var gameLife = function (global) {
     for (var i = 0; i < y; i++) {
       showMap[i] = new Array(x);
       calculationMap[i] = new Array(x);
+      for (var j = 0; j < x; j++) {
+        showMap[i][j] = 0;
+        calculationMap[i][j] = 1;
+      }
     }
   };
 
@@ -195,6 +198,8 @@ var gameLife = function (global) {
     context = canvas.getContext('2d');
     drawGrid();
     randomMap();
+    render();
+    start();
     $(canvas).mousedown(function (event) {
       var y = Math.floor((event.offsetX) / 10);
       var x = Math.floor((event.offsetY) / 10);
@@ -237,7 +242,11 @@ var gameLife = function (global) {
       height: height,
       rate: Math.round(1000 / time),
       density: lifeRate,
-      isStart: isStart
+      isStart: isStart,
+      size: size,
+      lifeColor: lifeColor,
+      deadColor: deadColor,
+      wallColor: wallColor
     }
   };
   global.gameControl = {
@@ -248,6 +257,8 @@ var gameLife = function (global) {
   global.__testOnly__ = {
     initArray: initArray,
     judge: judge,
+    randomMap: randomMap,
+    oneStep: nextStep,
     getCalculationMap: function() {
       return calculationMap;
     },
@@ -262,6 +273,15 @@ var gameLife = function (global) {
     },
     setShowMap: function(x, y, val) {
       showMap[x][y] = val;
+    },
+    setLifeRate: function (rate) {
+      lifeRate = rate;
+    },
+    getCanvasContext: function () {
+      return context;
+    },
+    getCanvas: function () {
+      return canvas;
     }
   };
 };
