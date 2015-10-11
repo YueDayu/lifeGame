@@ -369,7 +369,7 @@ module.exports = function (grunt) {
         'copy:styles'
       ],
       dist: [
-        'babel',
+        //'babel',
         'copy:styles',
         'imagemin',
         'svgmin'
