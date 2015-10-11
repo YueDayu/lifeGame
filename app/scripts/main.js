@@ -1,6 +1,8 @@
 (function() {
   'use strict';
 
+  gameLife(window);
+
   var width_input = $('#width');
   var height_input = $('#height');
   var rate_input = $('#rate');

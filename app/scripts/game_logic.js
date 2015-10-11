@@ -2,12 +2,12 @@
  * Created by Yue Dayu on 2015/9/27.
  */
 
-(function () {
+var gameLife = function (global) {
   'use strict';
 
   var size = 10;
-  var width = Math.floor(($(window).width() - 10) / size);
-  var height = Math.floor(($(window).height() - 10) / size);
+  var width = 100;
+  var height = 100;
   var showMap;
   var calculationMap;
   var canvas, context;
@@ -160,6 +160,18 @@
   };
 
   /*
+   * init the arrays
+   */
+  var initArray = function (x, y) {
+    showMap = new Array(y);
+    calculationMap = new Array(y);
+    for (var i = 0; i < y; i++) {
+      showMap[i] = new Array(x);
+      calculationMap[i] = new Array(x);
+    }
+  };
+
+  /*
    * param: (id, width, height, size, time, rate), (id, width), (id) or ()
    */
   var init = function () {
@@ -172,12 +184,7 @@
       time = arguments[4];
       lifeRate = arguments[5];
     }
-    showMap = new Array(height);
-    calculationMap = new Array(height);
-    for (var i = 0; i < height; i++) {
-      showMap[i] = new Array(width);
-      calculationMap[i] = new Array(width);
-    }
+    initArray(width, height);
     if (arguments.length != 0) {
       container = document.getElementById(arguments[0]);
     }
@@ -222,9 +229,9 @@
     init();
   };
 
-  window.lifeGame = init;
-  window.reloadGame = reload;
-  window.gameInfo = function () {
+  global.lifeGame = init;
+  global.reloadGame = reload;
+  global.gameInfo = function () {
     return {
       width: width,
       height: height,
@@ -233,8 +240,28 @@
       isStart: isStart
     }
   };
-  window.gameControl = {
+  global.gameControl = {
     stop: stop,
     start: start
   };
-})();
+
+  global.__testOnly__ = {
+    initArray: initArray,
+    judge: judge,
+    getCalculationMap: function() {
+      return calculationMap;
+    },
+    getShowMap: function() {
+      return showMap;
+    },
+    setWidth: function(x) {
+      width = x;
+    },
+    setHeight: function(y) {
+      height = y;
+    },
+    setShowMap: function(x, y, val) {
+      showMap[x][y] = val;
+    }
+  };
+};

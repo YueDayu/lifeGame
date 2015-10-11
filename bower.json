@@ -1,7 +1,11 @@
 {
-  "name": "lifegame",
+  "name": "ut",
   "private": true,
   "dependencies": {
-    "jquery": "~1.11.1"
+    "jquery": "~2.1.4"
+  },
+  "devDependencies": {
+    "chai": "~3.3.0",
+    "mocha": "~2.3.3"
   }
 }
