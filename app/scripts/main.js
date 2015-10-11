@@ -12,7 +12,7 @@
   var pause_btn = $('#pause');
 
   var setInfo = function() {
-    var gameInfo = window.gameInfo();
+    var gameInfo = run.gameInfo();
     width_input.val(gameInfo.width);
     height_input.val(gameInfo.height);
     rate_input.val(gameInfo.rate);
