@@ -1,7 +1,8 @@
 (function() {
   'use strict';
 
-  gameLife(window);
+  var run = {};
+  gameLife(run);
 
   var width_input = $('#width');
   var height_input = $('#height');
@@ -27,20 +28,20 @@
     }
   };
 
-  window.lifeGame('show', 100, 100, 10, 100, 0.5);
+  run.lifeGame('show', 100, 100, 10, 100, 0.5);
   setInfo();
   reload_btn.click(function() {
     var info = getInfo();
-    window.reloadGame(info.width, info.height, info.rate, info.density);
+    run.reloadGame(info.width, info.height, info.rate, info.density);
     setInfo();
   });
 
   pause_btn.click(function() {
-    if (window.gameInfo().isStart) {
-      window.gameControl.stop();
+    if (run.gameInfo().isStart) {
+      run.gameControl.stop();
       pause_btn.html('继续');
     } else {
-      window.gameControl.start();
+      run.gameControl.start();
       pause_btn.html('暂停');
     }
   });
